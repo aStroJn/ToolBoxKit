@@ -3,7 +3,10 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Converter from './pages/Converter';
+
+
 import Digital from './pages/Digital';
+
 import Calculator from './pages/Calculator';
 import SimpleCalculatorPage from './pages/SimpleCalculatorPage';
 import InterestCalculatorPage from './pages/InterestCalculatorPage';
@@ -17,10 +20,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/calculator" element={<Calculator />} />
+            <Route path="/SimpleCalculatorPage" element={<SimpleCalculatorPage />} />
+            <Route path="/InterestCalculatorPage" element={<InterestCalculatorPage />} />
             <Route path="/converter" element={<Converter />} />
             <Route path="/digital" element={<Digital />} />
-            <Route path="/SimpleCalculatorPage" element={<SimpleCalculatorPage />} />
-            <Route path="/InterestCalculator" element={<InterestCalculatorPage />} />
+            
           </Routes>
         </div>
       </Router>
