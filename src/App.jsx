@@ -2,9 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import Calculator from './pages/Calculator';
 import Converter from './pages/Converter';
 import Digital from './pages/Digital';
+import Calculator from './pages/Calculator';
+import SimpleCalculatorPage from './pages/SimpleCalculatorPage';
+import InterestCalculatorPage from './pages/InterestCalculatorPage';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
             <Route path="/calculator" element={<Calculator />} />
             <Route path="/converter" element={<Converter />} />
             <Route path="/digital" element={<Digital />} />
+            <Route path="/SimpleCalculatorPage" element={<SimpleCalculatorPage />} />
+            <Route path="/InterestCalculator" element={<InterestCalculatorPage />} />
           </Routes>
         </div>
       </Router>

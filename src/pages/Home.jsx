@@ -12,7 +12,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-12">
-          Welcome to ToolsHub
+          Welcome to <a href='/'>ToolsBoxKit</a>
         </h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
