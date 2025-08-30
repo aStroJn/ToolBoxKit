@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const Calculator = () => {
   const tools = [
     { name: 'Simple Calculator', path: '/SimpleCalculatorPage', emoji: '📔' },
-    { name: 'Intrest Calculator', path: '/InterestCalculator', emoji: '💰' },
+    { name: 'Intrest Calculator', path: '/InterestCalculatorPage', emoji: '💰' },
   ];
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">

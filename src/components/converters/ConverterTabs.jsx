@@ -1,9 +1,9 @@
 const ConverterTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
-    { id: 'document', label: '📄 Document' },
-    { id: 'image', label: '🖼️ Image',},
-    { id: 'video', label: '🎥 Video',},
-    { id: 'audio', label: '🎵 Audio',}
+    { id: 'document', label: 'Document', icon: '📄' },
+    { id: 'image', label: 'Image', icon: '🖼️'},
+    { id: 'video', label: 'Video',icon: '🎥'},
+    { id: 'audio', label: 'Audio',icon: '🎵'}
   ];
 
   return (
@@ -18,6 +18,7 @@ const ConverterTabs = ({ activeTab, setActiveTab }) => {
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
           }`}
         >
+          <span className="mr-2 text-lg">{tab.icon}</span>
           <span className="font-medium">{tab.label}</span>
         </button>
       ))}
