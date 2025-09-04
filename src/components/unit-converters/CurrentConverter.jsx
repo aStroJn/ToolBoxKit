@@ -28,7 +28,7 @@ const CurrentConverter = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Electric Current Converter
+        Electric Current Calculator
       </h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

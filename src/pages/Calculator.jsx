@@ -4,6 +4,7 @@ const Calculator = () => {
   const tools = [
     { name: 'Simple Calculator', path: '/SimpleCalculatorPage', emoji: '📔' },
     { name: 'Intrest Calculator', path: '/InterestCalculatorPage', emoji: '💰' },
+    { name: 'Unit Calculator', path: '/unit-converter', emoji: '📏' },
   ];
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">

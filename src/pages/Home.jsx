@@ -5,7 +5,6 @@ const Home = () => {
     { name: 'Calculator', path: '/calculator', emoji: '🧮' },
     { name: 'Converter', path: '/converter', emoji: '🔄' },
     { name: 'Digital Tools', path: '/digital', emoji: '💻' },
-    { name: 'Unit Converter', path: '/unit-converter', emoji: '📏' },
   ];
 
   return (
