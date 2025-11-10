@@ -4,6 +4,19 @@ const TimeExpression = () => {
   const [expression, setExpression] = useState('');
   const [result, setResult] = useState('');
 
+  // Safe expression evaluator for time calculations
+  const safeEval = (expression) => {
+    // Only allow numbers, basic operators, and decimal points
+    const sanitized = expression.replace(/[^0-9+\-*/().]/g, '');
+    if (sanitized !== expression) {
+      throw new Error('Invalid characters in expression');
+    }
+    
+    // Create a function that only allows mathematical operations
+    const calculate = new Function('return ' + sanitized);
+    return calculate();
+  };
+
   const evaluateExpression = () => {
     try {
       // Simple expression evaluator for time calculations
@@ -19,7 +32,7 @@ const TimeExpression = () => {
         .replace(/\*/g, ' * ')
         .replace(/\//g, ' / ');
 
-      const totalSeconds = eval(cleanExpr);
+      const totalSeconds = safeEval(cleanExpr);
       
       // Convert to readable format
       const days = Math.floor(totalSeconds / 86400);

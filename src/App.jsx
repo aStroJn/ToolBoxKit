@@ -7,7 +7,8 @@ import SimpleCalculatorPage from './pages/SimpleCalculatorPage';
 import InterestCalculatorPage from './pages/InterestCalculatorPage';
 import Converter from './pages/Converter';
 import Digital from './pages/Digital';
-import UnitConverter from './pages/UnitConverter'; 
+import UnitConverter from './pages/UnitConverter';
+import About from './pages/About'; 
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
             <Route path="/InterestCalculatorPage" element={<InterestCalculatorPage />} />
             <Route path="/converter" element={<Converter />} />
             <Route path="/digital" element={<Digital />} />
-            <Route path="/unit-converter" element={<UnitConverter />} /> 
+            <Route path="/unit-converter" element={<UnitConverter />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </div>
       </Router>

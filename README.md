@@ -1,12 +1,168 @@
-# React + Vite
+## Project Overview
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**ToolBoxKit** is a comprehensive web-based application that provides a collection of free, privacy-focused online tools. It's built as a Single Page Application (SPA) using React and Vite. The application features a clean, modern interface with dark mode support, implemented with Tailwind CSS.
 
-Currently, two official plugins are available:
+### Key Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: React 19.1.1
+- **Build Tool**: Vite 7.1.2
+- **Styling**: Tailwind CSS 3.4.17 with dark mode support
+- **Routing**: React Router DOM 7.8.2
+- **State Management**: React Context API for theme management
+- **Additional Libraries**: 
+  - FileSaver for file operations
+  - JSZip for zip compression
+  - ESLint for code linting
 
-## Expanding the ESLint configuration
+### Project Architecture
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The application follows a component-based architecture with:
+- A main App component that sets up routing and theme context
+- Context management for dark mode in `src/context/ThemeContext.jsx`
+- Components in `src/components/` (e.g., Navbar)
+- Pages in `src/pages/` directory (e.g., Home, Calculator, Converter)
+- CSS styling using Tailwind CSS and custom CSS
+- Configuration files for Vite, Tailwind, PostCSS, and ESLint
+
+### Features
+
+- **🌙 Dark Mode Toggle**: Persistent theme selection that saves to localStorage
+- **📱 Responsive Design**: Mobile-first approach using Tailwind CSS
+- **🧮 Advanced Calculators**:
+  - Simple Calculator with basic arithmetic
+  - Scientific Calculator with trigonometric and logarithmic functions
+  - Financial Calculator (Compound Interest, Simple Interest, Loan, EMI)
+  - Interest Calculator for investment calculations
+- **🔄 File Converters**:
+  - Image Converter (JPG, PNG, WEBP)
+  - Document Converter (PDF, DOCX, TXT, HTML)
+  - Video Converter (MP4, WEBM, AVI)
+  - Audio Converter (MP3, WAV, OGG)
+- **📏 Unit Converters**:
+  - Length, Mass, Time, Temperature, Current, Substance, Luminous
+  - Time Arithmetic, Date Calculator, Time Expression
+- **💻 Digital Tools**:
+  - QR Code Generator with customizable settings
+  - Password Generator with security strength indicator
+  - Color Picker with palette generation
+  - YouTube Downloader (simulation with educational notes)
+- **🔒 Privacy First**: All processing happens locally in your browser
+- **✅ No Registration**: Start using any tool immediately
+- **🎨 Modern UI**: Smooth transitions and hover effects
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js and npm (or a compatible package manager)
+
+### Installation
+
+1.  Clone the repository.
+2.  Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+### Running the Development Server
+
+To run the application in development mode with hot module replacement:
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173` by default (the port may vary).
+
+### Building for Production
+
+To create a production-ready build of the application:
+
+```bash
+npm run build
+```
+
+The optimized static files will be generated in the `dist` directory.
+
+### Previewing the Production Build
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+## Project Structure
+
+The project follows a standard React application structure:
+
+```
+my-toolbox/
+├── public/
+├── src/
+│   ├── components/
+│   │   └── Navbar.jsx
+│   ├── context/
+│   │   └── ThemeContext.jsx
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Calculator.jsx
+│   │   ├── SimpleCalculatorPage.jsx
+│   │   ├── InterestCalculatorPage.jsx
+│   │   ├── Converter.jsx
+│   │   ├── Digital.jsx
+│   │   └── UnitConverter.jsx
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── index.html
+├── package.json
+├── vite.config.js
+├── tailwind.config.js
+└── postcss.config.js
+```
+
+- **`public/`**: Contains static assets that are not processed by the build tool.
+- **`src/`**: The main source code directory.
+  - **`assets/`**: Static assets like images and SVGs that are imported into components.
+  - **`components/`**: Reusable React components used throughout the application.
+    - **`converters/`**: Components related to file conversion.
+    - **`digital-tools/`**: Components for digital tools like the YouTube downloader.
+    - **`unit-converters/`**: Components for the various unit converters.
+  - **`context/`**: React context providers, such as the `ThemeContext` for dark mode.
+  - **`pages/`**: Top-level components that correspond to the different pages of the application.
+  - **`App.jsx`**: The root component of the application, which sets up the routing.
+  - **`main.jsx`**: The entry point of the application, where the root component is rendered.
+- **`dist/`**: The output directory for the production build (generated by `npm run build`).
+- **Configuration Files**:
+  - **`vite.config.js`**: Vite configuration.
+  - **`tailwind.config.js`**: Tailwind CSS configuration.
+  - **`postcss.config.js`**: PostCSS configuration.
+  - **`eslint.config.js`**: ESLint configuration.
+
+### Development Conventions
+
+- **Component Naming**: PascalCase for React components
+- **File Naming**: JSX for React components, CSS for styles
+- **Routing**: React Router DOM for navigation between different tool sections
+- **Styling**: Primarily Tailwind CSS utility classes with some custom CSS
+- **Dark Mode**: Implemented using CSS classes and React context with localStorage persistence
+- **Code Quality**: ESLint with recommended React hooks and refresh plugins
+
+### Theme System
+
+The application implements a dark/light mode toggle:
+- State is managed in `ThemeContext.jsx`
+- Uses CSS `dark:` classes from Tailwind
+- Persists user preference in localStorage
+- Respects system preference by default
+
+### Navigation Structure
+
+The application has a main navigation with:
+- Home page as the landing page
+- Calculator section with multiple calculator types
+- Converter section for different conversion tools
+- Digital tools section
+- Each section contains multiple tool-specific pages

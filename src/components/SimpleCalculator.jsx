@@ -4,12 +4,25 @@ const SimpleCalculator = () => {
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
 
+  // Safe expression evaluator
+  const safeEval = (expression) => {
+    // Only allow numbers, basic operators, and decimal points
+    const sanitized = expression.replace(/[^0-9+\-*/().]/g, '');
+    if (sanitized !== expression) {
+      throw new Error('Invalid characters in expression');
+    }
+    
+    // Create a function that only allows mathematical operations
+    const calculate = new Function('return ' + sanitized);
+    return calculate();
+  };
+
   // Handle number and operator button clicks
   const handleButtonClick = (value) => {
     if (value === '=') {
       try {
         // Evaluate the expression safely
-        const evalResult = eval(input);
+        const evalResult = safeEval(input);
         setResult(evalResult.toString());
         setInput(evalResult.toString());
       } catch (error) {
