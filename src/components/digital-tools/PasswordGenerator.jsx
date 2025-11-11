@@ -65,7 +65,6 @@ const PasswordGenerator = () => {
   };
 
   const strength = getPasswordStrength(password);
-  const hasAllTypes = includeUppercase && includeLowercase && includeNumbers && includeSymbols;
 
   return (
     <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">

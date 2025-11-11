@@ -25,7 +25,7 @@ const SimpleCalculator = () => {
         const evalResult = safeEval(input);
         setResult(evalResult.toString());
         setInput(evalResult.toString());
-      } catch (error) {
+      } catch {
         setResult('Error');
       }
     } else if (value === 'C') {

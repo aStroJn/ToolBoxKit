@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
 const ColorPicker = () => {
-  const [color, setColor] = useState('#3b82f6');
-  const [colorHistory, setColorHistory] = useState([]);
+  const [color, setColor] = useState('#3B82F6');
   const [savedColors, setSavedColors] = useState([]);
 
   // Convert hex to RGB

@@ -1,0 +1,17 @@
+# SPA Routing Redirects
+# Redirect all routes to index.html for client-side routing
+
+# Production redirects
+/*    /index.html   200
+
+# Development redirects (if needed)
+# /api/*  http://localhost:3001/:splat  200
+
+# Security headers
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net; worker-src 'self' blob:;

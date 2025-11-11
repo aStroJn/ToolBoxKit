@@ -32,8 +32,6 @@ const TimeExpression = () => {
         .replace(/\//g, ' / ');
 
       const totalSeconds = safeEval(cleanExpr);
-      // Use Function constructor instead of eval for safer evaluation
-      const totalSeconds = new Function('return ' + cleanExpr)();
       
       // Convert to readable format
       const days = Math.floor(totalSeconds / 86400);
