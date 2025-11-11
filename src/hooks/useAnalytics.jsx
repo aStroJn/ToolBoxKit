@@ -311,9 +311,12 @@ export const useAnalytics = () => {
       });
     }
 
+    // Capture the start time for cleanup
+    const capturedStartTime = startTime.current;
+
     // Cleanup on unmount
     return () => {
-      const duration = Date.now() - startTime.current;
+      const duration = Date.now() - capturedStartTime;
       analytics.trackUserEngagement('component_unmount', duration);
     };
   }, []);

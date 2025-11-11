@@ -1,0 +1,15 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5175",
+  "executionArgs": {
+    "projectName": "ToolBoxKit",
+    "projectPath": "d:\\OPEN SOURCE\\my-toolbox",
+    "testIds": [],
+    "additionalInstruction": "Run comprehensive frontend tests for ToolBoxKit application. Test all converter components (video, audio, image, document), calculator tools, unit converters, and digital tools. Verify FFmpeg integration works properly, file uploads function correctly, and the user interface is responsive and accessible.",
+    "envs": {
+      "API_KEY": "sk-user-D_SobWIRBc_sWhuClswcgkT99EuVU7xB2es4bOqJ3DnPEjA-AG3aR3JPcsiidwNC5Xrm2QdwIavf26DOLTlUBV3Sv2Vh7_Na1d-fgyo08Gro7k6k-YSFJak9h1W9Hc9YDno"
+    }
+  }
+}

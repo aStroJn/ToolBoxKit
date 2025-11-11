@@ -48,7 +48,10 @@ const useFFmpeg = () => {
       const cdnUrls = [
         'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
         'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
-        'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm'
+        'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm',
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.4/dist/esm',
+        'https://unpkg.com/@ffmpeg/core@0.12.2/dist/esm',
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.2/dist/esm'
       ];
 
       let loaded = false;

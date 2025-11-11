@@ -89,7 +89,7 @@ const MassConverter = () => {
   const result = convert();
 
   // Get current conversion formula
-  const currentFormula = useMemo(() => {
+  const conversionFormula = useMemo(() => {
     const key = `${fromUnit}-${toUnit}`;
     if (conversionFormulas[key]) {
       return conversionFormulas[key];
@@ -104,7 +104,7 @@ const MassConverter = () => {
       formula: `${toUnit} = ${fromUnit} × ${conversionFactor.toExponential(6)}`,
       example: `1 ${fromUnit} = ${conversionFactor.toExponential(6)} ${toUnit}`
     };
-  }, [fromUnit, toUnit]);
+  }, [fromUnit, toUnit, conversionFormulas, unitsToKg]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -206,7 +206,7 @@ const MassConverter = () => {
               Conversion from {unitLabels[fromUnit]} to {unitLabels[toUnit]}
             </span>
             <div className="bg-white dark:bg-gray-600 p-3 rounded-lg font-mono text-sm text-gray-900 dark:text-white">
-              {currentFormula.formula}
+              {conversionFormula.formula}
             </div>
           </div>
 
@@ -215,7 +215,7 @@ const MassConverter = () => {
               Example
             </span>
             <div className="bg-white dark:bg-gray-600 p-3 rounded-lg text-sm text-gray-900 dark:text-white">
-              {currentFormula.example}
+              {conversionFormula.example}
             </div>
           </div>
 

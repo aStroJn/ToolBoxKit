@@ -1,0 +1,144 @@
+{
+  "tech_stack": [
+    "JavaScript",
+    "React 19.1.1",
+    "Vite 7.1.2",
+    "Tailwind CSS",
+    "React Router v7.8.2",
+    "FFmpeg.wasm",
+    "file-saver",
+    "jszip",
+    "npm"
+  ],
+  "features": [
+    {
+      "name": "Theme System",
+      "description": "Dark/light theme management with localStorage persistence",
+      "files": [
+        "src/context/ThemeContext.jsx",
+        "src/components/Navbar.jsx"
+      ]
+    },
+    {
+      "name": "Navigation System",
+      "description": "React Router setup with 7 main routes",
+      "files": [
+        "src/App.jsx",
+        "src/main.jsx",
+        "src/components/Navbar.jsx"
+      ]
+    },
+    {
+      "name": "Calculator Tools",
+      "description": "Multiple calculator components including simple and scientific calculators",
+      "files": [
+        "src/components/SimpleCalculator.jsx",
+        "src/components/ScientificCalculator.jsx",
+        "src/components/FinancialCalculator.jsx",
+        "src/components/InterestCalculator.jsx",
+        "src/pages/Calculator.jsx",
+        "src/pages/SimpleCalculatorPage.jsx",
+        "src/pages/InterestCalculatorPage.jsx"
+      ]
+    },
+    {
+      "name": "File Converter System",
+      "description": "FFmpeg-powered file conversion with professional UI and batch processing",
+      "files": [
+        "src/hooks/useFFmpeg.jsx",
+        "src/components/converters/VideoConverter.jsx",
+        "src/components/converters/AudioConverter.jsx",
+        "src/components/converters/ImageConverter.jsx",
+        "src/components/converters/DocumentConverter.jsx",
+        "src/components/converters/SimpleConverter.jsx",
+        "src/components/converters/ConverterTabs.jsx",
+        "src/pages/Converter.jsx"
+      ]
+    },
+    {
+      "name": "Unit Converter System",
+      "description": "Measurement unit conversion tools with 7 categories",
+      "files": [
+        "src/components/unit-converters/TemperatureConverter.jsx",
+        "src/components/unit-converters/LengthConverter.jsx",
+        "src/components/unit-converters/MassConverter.jsx",
+        "src/components/unit-converters/TimeConverter.jsx",
+        "src/components/unit-converters/CurrentConverter.jsx",
+        "src/components/unit-converters/SubstanceConverter.jsx",
+        "src/components/unit-converters/LuminousConverter.jsx",
+        "src/components/unit-converters/TimeArithmetic.jsx",
+        "src/components/unit-converters/TimeExpression.jsx",
+        "src/components/unit-converters/DateCalculator.jsx",
+        "src/components/unit-converters/UnitConverterTabs.jsx",
+        "src/pages/UnitConverter.jsx"
+      ]
+    },
+    {
+      "name": "Digital Tools",
+      "description": "Various digital utilities including QR generator, password generator, and color tools",
+      "files": [
+        "src/components/digital-tools/QRGenerator.jsx",
+        "src/components/digital-tools/PasswordGenerator.jsx",
+        "src/components/digital-tools/ColorPicker.jsx",
+        "src/components/digital-tools/YTDownloader.jsx",
+        "src/components/digital-tools/YTDownloadTabs.jsx",
+        "src/pages/Digital.jsx"
+      ]
+    },
+    {
+      "name": "FFmpeg Media Processing",
+      "description": "WebAssembly-based media processing with CDN fallbacks",
+      "files": [
+        "src/hooks/useFFmpeg.jsx"
+      ]
+    },
+    {
+      "name": "Home Page",
+      "description": "Landing page with tool navigation cards",
+      "files": [
+        "src/pages/Home.jsx"
+      ]
+    },
+    {
+      "name": "About Page",
+      "description": "Information page about the application",
+      "files": [
+        "src/pages/About.jsx"
+      ]
+    },
+    {
+      "name": "Global Styling",
+      "description": "Tailwind CSS configuration and global styles",
+      "files": [
+        "src/index.css",
+        "tailwind.config.js",
+        "postcss.config.js"
+      ]
+    },
+    {
+      "name": "Build Configuration",
+      "description": "Vite build configuration and development setup",
+      "files": [
+        "vite.config.js",
+        "package.json",
+        "eslint.config.js"
+      ]
+    },
+    {
+      "name": "PWA Configuration",
+      "description": "Progressive Web App manifest and service worker setup",
+      "files": [
+        "public/manifest.json"
+      ]
+    },
+    {
+      "name": "Testing Framework",
+      "description": "Test suite with Vitest and component tests",
+      "files": [
+        "test/setup.js",
+        "test/SimpleCalculator.test.jsx",
+        "test/TemperatureConverter.test.jsx"
+      ]
+    }
+  ]
+}

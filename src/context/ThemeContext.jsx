@@ -36,4 +36,3 @@ const ThemeProvider = ({ children }) => {
 };
 
 export { ThemeProvider, useTheme };
-export default ThemeContext;

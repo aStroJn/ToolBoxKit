@@ -45,7 +45,7 @@ const InterestCalculator = () => {
   // Recalculate whenever inputs change
   useEffect(() => {
     calculateInterest();
-  }, [principal, rate, time, interestType]);
+  }, [principal, rate, time, interestType, calculateInterest]);
 
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">
