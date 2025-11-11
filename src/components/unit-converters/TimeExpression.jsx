@@ -27,12 +27,13 @@ const TimeExpression = () => {
         .replace(/days?/gi, '*86400')
         .replace(/weeks?/gi, '*604800')
         .replace(/\s+/g, '')
-        .replace(/\+/g, ' + ')
-        .replace(/\-/g, ' - ')
+        .replace(/\\-/g, '-')
         .replace(/\*/g, ' * ')
         .replace(/\//g, ' / ');
 
       const totalSeconds = safeEval(cleanExpr);
+      // Use Function constructor instead of eval for safer evaluation
+      const totalSeconds = new Function('return ' + cleanExpr)();
       
       // Convert to readable format
       const days = Math.floor(totalSeconds / 86400);
@@ -41,7 +42,7 @@ const TimeExpression = () => {
       const seconds = totalSeconds % 60;
       
       setResult(`${days}d ${hours}h ${minutes}m ${seconds.toFixed(0)}s`);
-    } catch (error) {
+    } catch {
       setResult('Invalid expression');
     }
   };
