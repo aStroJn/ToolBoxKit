@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 .github
+.cursor
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +26,4 @@ dist-ssr
 
 .agent-plan.md
 ./testsprite_tests/*
+
