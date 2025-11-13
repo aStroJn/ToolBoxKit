@@ -6,7 +6,7 @@ const LengthConverter = () => {
   const [toUnit, setToUnit] = useState('km');
 
   // Conversion factors to meters (base unit)
-  const unitsToMeter = {
+  const unitsToMeter = useMemo(() => ({
     // Metric units
     m: 1,
     km: 1000,
@@ -23,10 +23,10 @@ const LengthConverter = () => {
 
     // Astronomical units
     'light-year': 9460730472580800 // meters in one light year
-  };
+  }), []);
 
   // Unit labels for display
-  const unitLabels = {
+  const unitLabels = useMemo(() => ({
     m: 'Meter (m)',
     km: 'Kilometer (km)',
     cm: 'Centimeter (cm)',
@@ -38,10 +38,10 @@ const LengthConverter = () => {
     foot: 'Foot',
     inch: 'Inch',
     'light-year': 'Light Year'
-  };
+  }), []);
 
   // Conversion formulas
-  const conversionFormulas = {
+  const conversionFormulas = useMemo(() => ({
     // Metric to Metric
     'm-km': { formula: 'km = m ÷ 1000', example: '1000 m = 1 km' },
     'm-cm': { formula: 'cm = m × 100', example: '1 m = 100 cm' },
@@ -76,7 +76,7 @@ const LengthConverter = () => {
     'm-m': { formula: 'm = m', example: 'No conversion needed' },
     'km-km': { formula: 'km = km', example: 'No conversion needed' },
     // Add more same-unit conversions as needed
-  };
+  }), []);
 
   const convert = () => {
     if (!inputValue) return '';

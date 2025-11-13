@@ -33,13 +33,17 @@ const TimeExpression = () => {
 
       const totalSeconds = safeEval(cleanExpr);
       
-      // Convert to readable format
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
+      // Handle negative values
+      const absSeconds = Math.abs(totalSeconds);
       
-      setResult(`${days}d ${hours}h ${minutes}m ${seconds.toFixed(0)}s`);
+      // Convert to readable format
+      const days = Math.floor(absSeconds / 86400);
+      const hours = Math.floor((absSeconds % 86400) / 3600);
+      const minutes = Math.floor((absSeconds % 3600) / 60);
+      const seconds = Math.floor(absSeconds % 60);
+      
+      const sign = totalSeconds < 0 ? '-' : '';
+      setResult(`${sign}${days}d ${hours}h ${minutes}m ${seconds}s`);
     } catch {
       setResult('Invalid expression');
     }

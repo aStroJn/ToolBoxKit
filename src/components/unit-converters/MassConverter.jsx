@@ -6,7 +6,7 @@ const MassConverter = () => {
   const [toUnit, setToUnit] = useState('g');
 
   // Conversion factors to kilograms (base unit)
-  const unitsToKg = {
+  const unitsToKg = useMemo(() => ({
     // Metric units
     kg: 1,
     g: 0.001,
@@ -22,10 +22,10 @@ const MassConverter = () => {
     // Special units
     carrat: 0.0002,
     'atomic-mass-unit': 1.66053906660e-27
-  };
+  }), []);
 
   // Unit labels for display
-  const unitLabels = {
+  const unitLabels = useMemo(() => ({
     kg: 'Kilogram (kg)',
     g: 'Gram (g)',
     mg: 'Milligram (mg)',
@@ -36,10 +36,10 @@ const MassConverter = () => {
     ounce: 'Ounce (oz)',
     carrat: 'Carrat',
     'atomic-mass-unit': 'Atomic Mass Unit (u)'
-  };
+  }), []);
 
   // Conversion formulas
-  const conversionFormulas = {
+  const conversionFormulas = useMemo(() => ({
     // Metric to Metric
     'kg-g': { formula: 'g = kg × 1000', example: '1 kg = 1000 g' },
     'kg-mg': { formula: 'mg = kg × 1,000,000', example: '1 kg = 1,000,000 mg' },
@@ -64,7 +64,7 @@ const MassConverter = () => {
     // Same unit conversion
     'kg-kg': { formula: 'kg = kg', example: 'No conversion needed' },
     'g-g': { formula: 'g = g', example: 'No conversion needed' },
-  };
+  }), []);
 
   const convert = () => {
     if (!inputValue) return '';

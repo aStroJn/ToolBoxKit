@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const InterestCalculator = () => {
   const [principal, setPrincipal] = useState('');
@@ -8,7 +8,7 @@ const InterestCalculator = () => {
   const [result, setResult] = useState(null);
 
   // Calculate interest based on type
-  const calculateInterest = () => {
+  const calculateInterest = useCallback(() => {
     const p = parseFloat(principal);
     const r = parseFloat(rate);
     const t = parseFloat(time);
@@ -34,7 +34,7 @@ const InterestCalculator = () => {
         totalAmount: amount.toFixed(2)
       });
     }
-  };
+  }, [principal, rate, time, interestType]);
 
   // Handle input changes and recalculate
   const handleInputChange = (setter) => (e) => {
