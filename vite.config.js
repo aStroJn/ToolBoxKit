@@ -36,7 +36,9 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]'
         }
       },
-      chunkSizeWarningLimit: 1000
+      chunkSizeWarningLimit: 1000,
+      // Include WASM files as assets
+      assetsInclude: ['**/*.wasm']
     },
     
     // Development Configuration
@@ -45,6 +47,11 @@ export default defineConfig(({ mode }) => {
       host: true, // Allow external connections
       strictPort: false,
       cors: true,
+      headers: {
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Resource-Policy': 'cross-origin'
+      },
       proxy: {
         '/api': {
           target: env.VITE_API_BASE_URL || 'http://localhost:3001',
@@ -59,7 +66,12 @@ export default defineConfig(({ mode }) => {
       port: 4173,
       host: true,
       strictPort: false,
-      cors: true
+      cors: true,
+      headers: {
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Resource-Policy': 'cross-origin'
+      }
     },
     
     // Resolver Configuration
@@ -92,10 +104,16 @@ export default defineConfig(({ mode }) => {
         'react',
         'react-dom',
         'react-router-dom',
-        '@ffmpeg/ffmpeg',
-        '@ffmpeg/util',
         'file-saver',
         'jszip'
+      ],
+      exclude: [
+        // Exclude FFMPEG from optimization - it uses workers internally
+        '@ffmpeg/ffmpeg',
+        '@ffmpeg/util',
+        // Exclude worker files from optimization
+        'worker.js',
+        '@ffmpeg/ffmpeg/dist/esm/worker'
       ]
     },
     

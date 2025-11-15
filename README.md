@@ -177,9 +177,36 @@ npm run dev
 
 # Frontend: http://localhost:5173
 # Vite automatically proxies /api/* requests to Gotenberg
+# Headers for FFMPEG.wasm (COEP, COOP) are automatically configured
 ```
 
+**Note:** FFMPEG.wasm requires specific HTTP headers (Cross-Origin-Embedder-Policy, Cross-Origin-Opener-Policy) which are automatically configured in `vite.config.js` for local development. These headers enable SharedArrayBuffer support needed for video/audio conversion.
+
 For detailed setup, configuration, and troubleshooting, see **[GOTENBERG_INTEGRATION.md](./GOTENBERG_INTEGRATION.md)**.
+
+### Vercel Deployment - FFMPEG.wasm
+
+ToolBoxKit is configured for deployment on Vercel with full FFMPEG.wasm support:
+
+- **Video/Audio Conversion**: Uses FFMPEG.wasm running in browser
+- **Required Headers**: Configured in `vercel.json` for WebAssembly support
+- **Browser Compatibility**: Chrome, Firefox, Safari (iOS 16.4+)
+
+**Deploy to Vercel:**
+```bash
+# Install Vercel CLI (if not already installed)
+npm i -g vercel
+
+# Deploy to production
+vercel --prod
+```
+
+**Key Configuration Files:**
+- `vercel.json` - HTTP headers and routing configuration
+- `public/_redirects` - CSP headers (for Netlify compatibility)
+- `vite.config.js` - WASM asset handling
+
+For detailed Vercel deployment instructions, troubleshooting, and browser compatibility information, see **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)**.
 
 ### Theme System
 

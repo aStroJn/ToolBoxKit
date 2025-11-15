@@ -46,8 +46,11 @@ npm install
 npm run dev
 
 # Vite proxy automatically forwards /api/* requests to Gotenberg
+# Headers for FFMPEG.wasm are automatically configured in vite.config.js
 # No additional configuration needed
 ```
+
+**Note:** FFMPEG.wasm (used for video/audio conversion) requires specific HTTP headers for SharedArrayBuffer support. These are automatically configured in `vite.config.js` for local development. For production deployment, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
 
 ## Configuration
 
