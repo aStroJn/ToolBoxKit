@@ -122,10 +122,7 @@ const useFFmpeg = () => {
         'https://esm.sh/@ffmpeg/core@0.12.6/dist/esm',
         // Fallback: Older stable versions
         'https://unpkg.com/@ffmpeg/core@0.12.2/dist/esm',
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.2/dist/esm',
-        // Last resort: Even older versions
-        'https://unpkg.com/@ffmpeg/core@0.11.6/dist/esm',
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.6/dist/esm'
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.2/dist/esm'
       ];
 
       let loaded = false;
