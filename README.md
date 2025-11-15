@@ -150,6 +150,37 @@ my-toolbox/
 - **Dark Mode**: Implemented using CSS classes and React context with localStorage persistence
 - **Code Quality**: ESLint with recommended React hooks and refresh plugins
 
+### Backend Services - Gotenberg Integration
+
+ToolBoxKit integrates **Gotenberg** (open-source document/image converter) for reliable server-side conversions:
+
+- **Image Conversion**: JPG, PNG, WEBP with quality control (via `ImageConverter.jsx`)
+- **Document Conversion**: PDF, DOCX, XLSX, PPTX, HTML, TXT (via `DocumentConverter.jsx`)
+- **Health Monitoring**: Automatic service status checking with retry mechanism
+- **Scalable Architecture**: Horizontal scaling support via containerization
+
+**Running with Gotenberg (Recommended)**:
+```bash
+# Start full stack with Docker Compose
+docker-compose up -d
+
+# Access:
+# Frontend: http://localhost (Nginx)
+# Gotenberg: http://localhost:3000 (REST API)
+# Optional Monitoring: http://localhost:3000 (Grafana with --profile monitoring)
+```
+
+**Local Development**:
+```bash
+# Start dev server with automatic proxy
+npm run dev
+
+# Frontend: http://localhost:5173
+# Vite automatically proxies /api/* requests to Gotenberg
+```
+
+For detailed setup, configuration, and troubleshooting, see **[GOTENBERG_INTEGRATION.md](./GOTENBERG_INTEGRATION.md)**.
+
 ### Theme System
 
 The application implements a dark/light mode toggle:

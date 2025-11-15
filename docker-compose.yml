@@ -29,6 +29,29 @@ services:
       retries: 3
       start_period: 40s
 
+  # Gotenberg for document & image conversion
+  gotenberg:
+    image: gotenberg/gotenberg:8-alpine
+    container_name: toolboxkit-gotenberg
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Disable features not needed for this use case
+      - GOTENBERG_DISABLE_UNOCONV=true
+      # Logging
+      - LOG_LEVEL=info
+    networks:
+      - toolboxkit-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    tmpfs:
+      - /tmp:noexec,nosuid,size=500m
+      - /home/gotenberg:noexec,nosuid,size=500m
+
   # Redis for caching (optional future feature)
   redis:
     image: redis:7-alpine

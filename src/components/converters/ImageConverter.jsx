@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import useRemoteConversion from '../../hooks/useRemoteConversion';
+import { useRef, useState } from 'react';
+import useGotenberg from '../../hooks/useGotenberg';
 
 const SUPPORTED_FORMATS = ['JPG', 'PNG', 'WEBP'];
 
@@ -16,15 +16,15 @@ const ImageConverter = () => {
     isProcessing,
     progress,
     error,
-    conversionQueue,
-    currentConversion,
-    completedConversions,
-    enqueueConversions,
-    cancelCurrent,
-    resetState,
+    successMessage,
+    processedFiles,
+    currentFile,
+    convertFiles,
+    cancel,
+    reset,
     refreshHealth,
-    canStartConversions,
-  } = useRemoteConversion('images', { pollIntervalMs: 2000 });
+    canConvert,
+  } = useGotenberg('image');
 
   const handleFileSelect = (event) => {
     const selectedFiles = Array.from(event.target.files).filter((file) => file.type.startsWith('image/'));
@@ -48,34 +48,22 @@ const ImageConverter = () => {
   };
 
   const startConversion = async () => {
-    if (!files.length || !canStartConversions) return;
+    if (!files.length || !canConvert) return;
     try {
-      await enqueueConversions(files, selectedFormat, { quality });
+      await convertFiles(files, selectedFormat, { quality });
     } catch (conversionError) {
       console.error('Image conversion failed to start:', conversionError);
     }
   };
 
   const handleCancel = () => {
-    cancelCurrent();
+    cancel();
   };
 
   const handleReset = () => {
-    resetState();
+    reset();
     setFiles([]);
   };
-
-  const filesSummary = useMemo(
-    () =>
-      files.map((file) => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      })),
-    [files],
-  );
-
-  const isConverting = isProcessing || conversionQueue.length > 0;
 
   return (
     <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
@@ -124,7 +112,7 @@ const ImageConverter = () => {
       <div className="p-6 space-y-6">
         <div
           className="bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20 rounded-xl p-8 border-2 border-dashed border-orange-200 dark:border-orange-500/50 hover:border-orange-400 dark:hover:border-orange-400 transition-all duration-300 cursor-pointer"
-          onClick={() => !isConverting && fileInputRef.current?.click()}
+          onClick={() => !isProcessing && fileInputRef.current?.click()}
         >
           <div className="text-center">
             <div className="text-6xl mb-4">📸</div>
@@ -138,9 +126,9 @@ const ImageConverter = () => {
               className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:transform-none"
               onClick={(e) => {
                 e.stopPropagation();
-                if (!isConverting) fileInputRef.current?.click();
+                if (!isProcessing) fileInputRef.current?.click();
               }}
-              disabled={isConverting}
+              disabled={isProcessing}
             >
               Choose Images
             </button>
@@ -155,20 +143,20 @@ const ImageConverter = () => {
           </div>
         </div>
 
-        {filesSummary.length > 0 && (
+        {files.length > 0 && (
           <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-semibold text-gray-900 dark:text-white">Selected Images</h4>
               <button
                 onClick={clearFiles}
-                disabled={isConverting}
+                disabled={isProcessing}
                 className="text-red-500 hover:text-red-700 disabled:text-gray-400 text-sm font-medium"
               >
                 Clear All
               </button>
             </div>
             <div className="space-y-3 max-h-72 overflow-y-auto pr-2">
-              {filesSummary.map((file, index) => (
+              {files.map((file, index) => (
                 <div
                   key={file.name}
                   className="flex items-center justify-between p-3 bg-white dark:bg-gray-600 rounded-lg shadow-sm"
@@ -182,7 +170,7 @@ const ImageConverter = () => {
                       </p>
                     </div>
                   </div>
-                  {!isConverting && (
+                  {!isProcessing && (
                     <button
                       onClick={() => removeFile(index)}
                       className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -206,7 +194,7 @@ const ImageConverter = () => {
                 <button
                   key={format}
                   onClick={() => setSelectedFormat(format)}
-                  disabled={isConverting}
+                  disabled={isProcessing}
                   className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                     selectedFormat === format
                       ? 'border-orange-500 bg-orange-500 text-white shadow-lg transform scale-105'
@@ -232,7 +220,7 @@ const ImageConverter = () => {
                 max="100"
                 value={quality}
                 onChange={(e) => setQuality(parseInt(e.target.value, 10))}
-                disabled={isConverting}
+                disabled={isProcessing}
                 className="w-full sm:w-48 accent-orange-500"
               />
               <span className="text-gray-900 dark:text-white w-12 text-right text-sm">{quality}%</span>
@@ -240,23 +228,23 @@ const ImageConverter = () => {
           </div>
         </div>
 
-        {(isProcessing || conversionQueue.length > 0 || completedConversions.length > 0 || error) && (
+        {(isProcessing || processedFiles.length > 0 || successMessage || error) && (
           <div className="bg-gradient-to-r from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20 rounded-xl p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-semibold text-gray-900 dark:text-white">Conversion Progress</h4>
-              {isConverting && (
+              {isProcessing && (
                 <button className="text-sm text-red-600 dark:text-red-400 hover:underline" onClick={handleCancel}>
                   Cancel current job
                 </button>
               )}
             </div>
 
-            {currentConversion && (
+            {currentFile && (
               <div className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-inner">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Converting:</span>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {currentConversion.file.name} → {currentConversion.targetFormat}
+                    {currentFile.name} → {currentFile.format}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
@@ -266,41 +254,41 @@ const ImageConverter = () => {
                   />
                 </div>
                 <div className="flex justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  <span>{progress}% complete</span>
+                  <span>{Math.round(progress)}% complete</span>
                   <span>Quality {quality}%</span>
                 </div>
               </div>
             )}
 
-            {conversionQueue.length > 0 && (
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {conversionQueue.length} file{conversionQueue.length > 1 ? 's' : ''} remaining in queue
+            {successMessage && (
+              <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-4 text-sm text-green-700 dark:text-green-300">
+                {successMessage}
               </div>
             )}
 
-            {completedConversions.length > 0 && (
+            {processedFiles.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Completed ({completedConversions.length})
+                  Processed ({processedFiles.length})
                 </p>
                 <div className="space-y-2 max-h-56 overflow-y-auto pr-2">
-                  {completedConversions.map((conversion) => (
+                  {processedFiles.map((file) => (
                     <div
-                      key={conversion.id}
+                      key={file.id}
                       className={`p-3 rounded-lg flex items-center justify-between ${
-                        conversion.status === 'completed'
+                        file.status === 'completed'
                           ? 'bg-green-100 dark:bg-green-900/40'
                           : 'bg-red-100 dark:bg-red-900/40'
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg">{conversion.status === 'completed' ? '✅' : '❌'}</span>
+                        <span className="text-lg">{file.status === 'completed' ? '✅' : '❌'}</span>
                         <span className="text-sm text-gray-700 dark:text-gray-300">
-                          {conversion.originalFile.name}
+                          {file.originalFile}
                         </span>
                       </div>
                       <span className="text-xs text-gray-600 dark:text-gray-400">
-                        {conversion.status === 'completed' ? 'Downloaded' : conversion.error || 'Failed'}
+                        {file.status === 'completed' ? 'Downloaded' : file.error || 'Failed'}
                       </span>
                     </div>
                   ))}
@@ -319,11 +307,11 @@ const ImageConverter = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={startConversion}
-            disabled={!files.length || !canStartConversions}
+            disabled={!files.length || !canConvert}
             className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none shadow-lg"
           >
             <span className="flex items-center justify-center space-x-2">
-              {isConverting ? (
+              {isProcessing ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
                   <span>Processing…</span>
@@ -337,7 +325,7 @@ const ImageConverter = () => {
             </span>
           </button>
 
-          {(completedConversions.length > 0 || error) && (
+          {(processedFiles.length > 0 || error) && (
             <button
               onClick={handleReset}
               className="px-6 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:border-red-300 hover:text-red-600 dark:hover:border-red-600 dark:hover:text-red-400 transition-all duration-200 disabled:opacity-50"
@@ -351,12 +339,12 @@ const ImageConverter = () => {
           <div className="flex items-start space-x-3">
             <span className="text-orange-500 text-xl">ℹ️</span>
             <div>
-              <h5 className="font-semibold text-orange-900 dark:text-orange-200 mb-1">Production Features</h5>
+              <h5 className="font-semibold text-orange-900 dark:text-orange-200 mb-1">Powered by Gotenberg</h5>
               <ul className="text-sm text-orange-700 dark:text-orange-300 space-y-1">
-                <li>• Highly-available image pipeline with auto-scaling workers</li>
-                <li>• Automatic download delivery with signed URLs</li>
-                <li>• Quality-aware conversion metadata for downstream analytics</li>
-                <li>• Full observability hooks for monitoring and alerting</li>
+                <li>• Fast, reliable image conversion via Gotenberg service</li>
+                <li>• Supports JPG, PNG, and WEBP formats</li>
+                <li>• Quality-aware conversion with configurable output quality</li>
+                <li>• Automatic local download delivery</li>
               </ul>
             </div>
           </div>
