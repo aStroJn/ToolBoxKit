@@ -10,6 +10,14 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     
+    // Test Configuration
+    test: {
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: ['./src/test/setup.js'],
+      css: true,
+    },
+    
     // Build Configuration
     build: {
       target: 'es2015',
@@ -50,7 +58,8 @@ export default defineConfig(({ mode }) => {
       headers: {
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Resource-Policy': 'cross-origin'
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net;"
       },
       proxy: {
         '/api': {
@@ -70,7 +79,8 @@ export default defineConfig(({ mode }) => {
       headers: {
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Resource-Policy': 'cross-origin'
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net;"
       }
     },
     

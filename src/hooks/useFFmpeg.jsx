@@ -14,28 +14,47 @@ const useFFmpeg = () => {
   // Check browser compatibility for FFMPEG.wasm
   const checkBrowserCompatibility = useCallback(() => {
     const issues = [];
+    const diagnostics = [];
 
     // Check WebAssembly support
     if (typeof WebAssembly === 'undefined') {
       issues.push('WebAssembly is not supported in this browser');
+      diagnostics.push('❌ WebAssembly: Not supported');
+    } else {
+      diagnostics.push('✅ WebAssembly: Supported');
     }
 
     // Check SharedArrayBuffer support (required for FFMPEG.wasm)
     if (typeof SharedArrayBuffer === 'undefined') {
       issues.push('SharedArrayBuffer is not available. This may be due to missing Cross-Origin-Embedder-Policy headers.');
+      diagnostics.push('❌ SharedArrayBuffer: Not available (requires COEP header)');
     } else {
       // Check if SharedArrayBuffer is actually usable (not just defined)
       try {
         const testBuffer = new SharedArrayBuffer(1);
         if (!testBuffer) {
           issues.push('SharedArrayBuffer is defined but not usable');
+          diagnostics.push('❌ SharedArrayBuffer: Defined but not usable');
+        } else {
+          diagnostics.push('✅ SharedArrayBuffer: Available and usable');
         }
       } catch (e) {
         issues.push(`SharedArrayBuffer test failed: ${e.message}`);
+        diagnostics.push(`❌ SharedArrayBuffer: ${e.message}`);
       }
     }
 
-    return issues;
+    // Check for COEP header
+    if (typeof SharedArrayBuffer !== 'undefined') {
+      diagnostics.push('✅ COEP Check: SharedArrayBuffer available (COEP headers present)');
+    }
+
+    // Log diagnostics
+    console.log('=== Browser Compatibility Diagnostics ===');
+    diagnostics.forEach(d => console.log(d));
+    console.log('==========================================');
+
+    return { issues, diagnostics };
   }, []);
 
   const loadFFmpeg = useCallback(async () => {
@@ -54,15 +73,21 @@ const useFFmpeg = () => {
       console.log('Starting FFmpeg load...');
 
       // Check browser compatibility first
-      const compatibilityIssues = checkBrowserCompatibility();
-      if (compatibilityIssues.length > 0) {
-        const errorMessage = `Browser compatibility issues detected:\n${compatibilityIssues.join('\n')}\n\nPlease ensure your browser supports WebAssembly and SharedArrayBuffer. For SharedArrayBuffer, ensure the site is served with Cross-Origin-Embedder-Policy: require-corp header.`;
+      const { issues, diagnostics } = checkBrowserCompatibility();
+      
+      // Add diagnostics to log
+      diagnostics.forEach(d => {
+        setLog(prev => prev + '\n' + d);
+      });
+
+      if (issues.length > 0) {
+        const errorMessage = `Browser compatibility issues detected:\n${issues.join('\n')}\n\nPlease ensure your browser supports WebAssembly and SharedArrayBuffer. For SharedArrayBuffer, ensure the site is served with Cross-Origin-Embedder-Policy: require-corp header.`;
         setError(errorMessage);
         setLog(prev => prev + `\n❌ ${errorMessage}`);
         throw new Error(errorMessage);
       }
 
-      setLog('Browser compatibility check passed');
+      setLog(prev => prev + '\n✅ Browser compatibility check passed');
       
       const ffmpeg = new FFmpeg();
       ffmpegRef.current = ffmpeg;
@@ -101,13 +126,13 @@ const useFFmpeg = () => {
       for (let retry = 0; retry <= maxRetries && !loaded; retry++) {
         if (retry > 0) {
           const backoffDelay = Math.min(1000 * Math.pow(2, retry - 1), 5000);
-          setLog(`Retry attempt ${retry} after ${backoffDelay}ms delay...`);
+          setLog(prev => prev + `\n⏳ Retry attempt ${retry} after ${backoffDelay}ms delay...`);
           await new Promise(resolve => setTimeout(resolve, backoffDelay));
         }
 
         for (const baseURL of cdnUrls) {
           try {
-            setLog(`Trying to load from ${baseURL}...`);
+            setLog(prev => prev + `\n⬇️  Loading from: ${baseURL}`);
             console.log(`Loading FFmpeg from: ${baseURL}`);
             
             // Create timeout promise
@@ -132,17 +157,29 @@ const useFFmpeg = () => {
             
             // Provide more specific error messages
             let errorMessage = cdnError.message || 'Unknown error';
+            let errorType = '❌';
+
             if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
-              errorMessage = `CORS error: ${errorMessage}. Check Content-Security-Policy and CORS headers.`;
+              errorType = '🚫 CORS';
+              errorMessage = `CORS Error: ${errorMessage}. Ensure CDN endpoints have CORS enabled and 'connect-src' allows them in CSP.`;
             } else if (errorMessage.includes('CSP') || errorMessage.includes('Content-Security-Policy')) {
-              errorMessage = `CSP violation: ${errorMessage}. Ensure 'wasm-unsafe-eval' is in script-src directive.`;
+              errorType = '🔒 CSP';
+              errorMessage = `CSP Violation: ${errorMessage}. Add 'wasm-unsafe-eval' and 'blob:' to script-src in CSP headers.`;
+            } else if (errorMessage.includes('blob')) {
+              errorType = '🔗 Blob URL';
+              errorMessage = `Blob URL Error: ${errorMessage}. Ensure 'blob:' is allowed in script-src and worker-src CSP directives.`;
             } else if (errorMessage.includes('timeout')) {
-              errorMessage = `Load timeout: ${errorMessage}. Network may be slow or CDN unavailable.`;
-            } else if (errorMessage.includes('SharedArrayBuffer')) {
-              errorMessage = `SharedArrayBuffer error: ${errorMessage}. Ensure Cross-Origin-Embedder-Policy header is set.`;
+              errorType = '⏱️ Timeout';
+              errorMessage = `Load Timeout: ${errorMessage}. Network may be slow or CDN temporarily unavailable.`;
+            } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('SAB')) {
+              errorType = '⚠️ SharedArrayBuffer';
+              errorMessage = `SharedArrayBuffer Error: ${errorMessage}. Ensure 'Cross-Origin-Embedder-Policy: require-corp' header is set on the server.`;
+            } else if (errorMessage.includes('Wasm')) {
+              errorType = '⚙️ WASM';
+              errorMessage = `WebAssembly Error: ${errorMessage}. Check browser WebAssembly support and WASM MIME type configuration.`;
             }
             
-            setLog(prev => prev + `\nFailed from ${baseURL}: ${errorMessage}`);
+            setLog(prev => prev + `\n${errorType}: Failed from ${new URL(baseURL).hostname} - ${errorMessage}`);
           }
         }
 
@@ -151,16 +188,30 @@ const useFFmpeg = () => {
 
       if (!loaded) {
         const errorMessage = lastError?.message || 'Unknown error';
-        let userFriendlyError = `All CDN sources failed after ${maxRetries + 1} attempts. `;
+        let userFriendlyError = `⚠️ All CDN sources failed after ${maxRetries + 1} attempts.\n\nLast error: ${errorMessage}\n\n`;
         
         if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
-          userFriendlyError += 'This appears to be a CORS issue. Please check your deployment configuration.';
+          userFriendlyError += '🔧 Solution: This is a CORS issue. Check your deployment configuration and ensure:\n' +
+            '  • CDN URLs are accessible\n' +
+            '  • "connect-src" in CSP allows the CDN\n' +
+            '  • Your network/firewall allows CDN access';
         } else if (errorMessage.includes('CSP') || errorMessage.includes('Content-Security-Policy')) {
-          userFriendlyError += 'This appears to be a Content-Security-Policy issue. Ensure "wasm-unsafe-eval" is included in the script-src directive.';
-        } else if (errorMessage.includes('SharedArrayBuffer')) {
-          userFriendlyError += 'SharedArrayBuffer is required but not available. Ensure Cross-Origin-Embedder-Policy: require-corp header is set.';
+          userFriendlyError += '🔧 Solution: This is a CSP (Content-Security-Policy) issue. Ensure your server headers include:\n' +
+            '  • "script-src \'self\' \'unsafe-eval\' \'wasm-unsafe-eval\' blob: https://unpkg.com https://cdn.jsdelivr.net"\n' +
+            '  • "worker-src \'self\' blob:"\n' +
+            '  • Check nginx.conf or your web server CSP configuration';
+        } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('SAB')) {
+          userFriendlyError += '🔧 Solution: SharedArrayBuffer requires specific headers. Ensure your server includes:\n' +
+            '  • "Cross-Origin-Embedder-Policy: require-corp"\n' +
+            '  • "Cross-Origin-Opener-Policy: same-origin"\n' +
+            '  • "Cross-Origin-Resource-Policy: cross-origin"\n' +
+            '  • Check that your site is served over HTTPS in production';
         } else {
-          userFriendlyError += `Last error: ${errorMessage}`;
+          userFriendlyError += '🔧 Troubleshooting steps:\n' +
+            '  1. Check browser console (F12) for detailed error messages\n' +
+            '  2. Verify network connectivity to CDNs (unpkg.com, jsdelivr.net)\n' +
+            '  3. Ensure CSP headers are properly configured\n' +
+            '  4. Verify COEP headers are present';
         }
         
         throw new Error(userFriendlyError);
