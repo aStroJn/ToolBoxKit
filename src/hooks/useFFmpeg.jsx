@@ -107,14 +107,25 @@ const useFFmpeg = () => {
         console.log('FFmpeg progress:', percentage + '%');
       });
 
-      // Try different CDN URLs with fallbacks
+      // Try different CDN URLs with comprehensive fallback chain
+      // Includes: unpkg, jsdelivr (multiple paths), esm.sh, and alternative versions
       const cdnUrls = [
+        // Primary: unpkg.com (latest stable)
         'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
+        // Primary: jsdelivr.net (latest stable - multiple paths)
         'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@latest/dist/esm',
+        // Secondary: Alternative jsdelivr paths
         'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm',
         'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.4/dist/esm',
+        // Tertiary: esm.sh mirror (alternative CDN)
+        'https://esm.sh/@ffmpeg/core@0.12.6/dist/esm',
+        // Fallback: Older stable versions
         'https://unpkg.com/@ffmpeg/core@0.12.2/dist/esm',
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.2/dist/esm'
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.2/dist/esm',
+        // Last resort: Even older versions
+        'https://unpkg.com/@ffmpeg/core@0.11.6/dist/esm',
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.6/dist/esm'
       ];
 
       let loaded = false;
@@ -140,11 +151,28 @@ const useFFmpeg = () => {
               setTimeout(() => reject(new Error('FFmpeg load timeout after 30 seconds')), LOAD_TIMEOUT)
             );
 
-            // Create load promise
-            const loadPromise = ffmpeg.load({
-              coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-              wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-            });
+            // Create load promise with enhanced error handling
+            const loadPromise = (async () => {
+              try {
+                const coreURL = await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript');
+                const wasmURL = await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm');
+                
+                if (!coreURL || !wasmURL) {
+                  throw new Error('Failed to create blob URLs - toBlobURL returned null');
+                }
+                
+                return ffmpeg.load({
+                  coreURL,
+                  wasmURL
+                });
+              } catch (err) {
+                // Add context to blob URL errors
+                if (err.message.includes('Failed') || err.message.includes('null')) {
+                  throw new Error(`Blob URL creation failed: ${err.message}. This may indicate network/CORS issues with CDN.`);
+                }
+                throw err;
+              }
+            })();
 
             // Race between load and timeout
             await Promise.race([loadPromise, timeoutPromise]);
@@ -159,24 +187,24 @@ const useFFmpeg = () => {
             let errorMessage = cdnError.message || 'Unknown error';
             let errorType = '❌';
 
-            if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
-              errorType = '🚫 CORS';
-              errorMessage = `CORS Error: ${errorMessage}. Ensure CDN endpoints have CORS enabled and 'connect-src' allows them in CSP.`;
+            if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin') || errorMessage.includes('fetch')) {
+              errorType = '🚫 CORS/Network';
+              errorMessage = `Network/CORS Error: ${errorMessage}. CDN may be unreachable or CORS misconfigured.`;
+            } else if (errorMessage.includes('Blob URL') || errorMessage.includes('toBlobURL')) {
+              errorType = '🔗 Blob URL';
+              errorMessage = `Blob URL Error: ${errorMessage}. Ensure 'blob:' is allowed in script-src and worker-src CSP.`;
             } else if (errorMessage.includes('CSP') || errorMessage.includes('Content-Security-Policy')) {
               errorType = '🔒 CSP';
-              errorMessage = `CSP Violation: ${errorMessage}. Add 'wasm-unsafe-eval' and 'blob:' to script-src in CSP headers.`;
-            } else if (errorMessage.includes('blob')) {
-              errorType = '🔗 Blob URL';
-              errorMessage = `Blob URL Error: ${errorMessage}. Ensure 'blob:' is allowed in script-src and worker-src CSP directives.`;
+              errorMessage = `CSP Violation: ${errorMessage}. Check CSP headers allow 'wasm-unsafe-eval' and 'blob:' in script-src.`;
             } else if (errorMessage.includes('timeout')) {
               errorType = '⏱️ Timeout';
               errorMessage = `Load Timeout: ${errorMessage}. Network may be slow or CDN temporarily unavailable.`;
             } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('SAB')) {
               errorType = '⚠️ SharedArrayBuffer';
-              errorMessage = `SharedArrayBuffer Error: ${errorMessage}. Ensure 'Cross-Origin-Embedder-Policy: require-corp' header is set on the server.`;
+              errorMessage = `SharedArrayBuffer Error: ${errorMessage}. Ensure 'Cross-Origin-Embedder-Policy: require-corp' header is set.`;
             } else if (errorMessage.includes('Wasm')) {
               errorType = '⚙️ WASM';
-              errorMessage = `WebAssembly Error: ${errorMessage}. Check browser WebAssembly support and WASM MIME type configuration.`;
+              errorMessage = `WebAssembly Error: ${errorMessage}. Check browser WASM support and WASM MIME type configuration.`;
             }
             
             setLog(prev => prev + `\n${errorType}: Failed from ${new URL(baseURL).hostname} - ${errorMessage}`);
@@ -190,28 +218,41 @@ const useFFmpeg = () => {
         const errorMessage = lastError?.message || 'Unknown error';
         let userFriendlyError = `⚠️ All CDN sources failed after ${maxRetries + 1} attempts.\n\nLast error: ${errorMessage}\n\n`;
         
-        if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
-          userFriendlyError += '🔧 Solution: This is a CORS issue. Check your deployment configuration and ensure:\n' +
-            '  • CDN URLs are accessible\n' +
-            '  • "connect-src" in CSP allows the CDN\n' +
-            '  • Your network/firewall allows CDN access';
+        if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin') || errorMessage.includes('Network') || errorMessage.includes('fetch')) {
+          userFriendlyError += '🔧 Solution: This appears to be a network/CORS connectivity issue. Try:\n' +
+            '  1. Check if unpkg.com and cdn.jsdelivr.net are accessible from your location\n' +
+            '  2. Try using a VPN or different network\n' +
+            '  3. Ensure firewall/proxy doesn\'t block CDN access\n' +
+            '  4. If on Vercel, check edge function logs for more details\n' +
+            '  5. Wait a few minutes and try again (CDNs may be temporarily down)';
         } else if (errorMessage.includes('CSP') || errorMessage.includes('Content-Security-Policy')) {
-          userFriendlyError += '🔧 Solution: This is a CSP (Content-Security-Policy) issue. Ensure your server headers include:\n' +
-            '  • "script-src \'self\' \'unsafe-eval\' \'wasm-unsafe-eval\' blob: https://unpkg.com https://cdn.jsdelivr.net"\n' +
-            '  • "worker-src \'self\' blob:"\n' +
-            '  • Check nginx.conf or your web server CSP configuration';
+          userFriendlyError += '🔧 Solution: This is a CSP (Content-Security-Policy) issue. Verify:\n' +
+            '  • "script-src" includes \'unsafe-eval\', \'wasm-unsafe-eval\', and blob:\n' +
+            '  • "script-src" includes https://unpkg.com and https://cdn.jsdelivr.net\n' +
+            '  • "worker-src" includes \'self\' and blob:\n' +
+            '  • "connect-src" includes https://unpkg.com and https://cdn.jsdelivr.net\n' +
+            '  • Redeploy after changes to pick up new headers';
+        } else if (errorMessage.includes('Blob URL') || errorMessage.includes('toBlobURL')) {
+          userFriendlyError += '🔧 Solution: Blob URL creation failed. Ensure:\n' +
+            '  • CSP allows "blob:" in script-src and worker-src\n' +
+            '  • Cross-Origin headers are properly set (COEP, COOP)\n' +
+            '  • Your browser hasn\'t run out of memory\n' +
+            '  • Network connection to CDNs is stable';
         } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('SAB')) {
-          userFriendlyError += '🔧 Solution: SharedArrayBuffer requires specific headers. Ensure your server includes:\n' +
-            '  • "Cross-Origin-Embedder-Policy: require-corp"\n' +
-            '  • "Cross-Origin-Opener-Policy: same-origin"\n' +
-            '  • "Cross-Origin-Resource-Policy: cross-origin"\n' +
-            '  • Check that your site is served over HTTPS in production';
+          userFriendlyError += '🔧 Solution: SharedArrayBuffer requires specific headers. Verify:\n' +
+            '  • "Cross-Origin-Embedder-Policy: require-corp" is set\n' +
+            '  • "Cross-Origin-Opener-Policy: same-origin" is set\n' +
+            '  • "Cross-Origin-Resource-Policy: cross-origin" is set on WASM endpoint\n' +
+            '  • Site is served over HTTPS in production\n' +
+            '  • Redeploy after header changes';
         } else {
           userFriendlyError += '🔧 Troubleshooting steps:\n' +
-            '  1. Check browser console (F12) for detailed error messages\n' +
-            '  2. Verify network connectivity to CDNs (unpkg.com, jsdelivr.net)\n' +
-            '  3. Ensure CSP headers are properly configured\n' +
-            '  4. Verify COEP headers are present';
+            '  1. Open browser console (F12) and check for network errors\n' +
+            '  2. Check Network tab - look for failed requests to unpkg.com or cdn.jsdelivr.net\n' +
+            '  3. Verify CSP headers are correct: Right-click → Inspect → Network → Response Headers\n' +
+            '  4. Ensure browser allows WebAssembly and SharedArrayBuffer\n' +
+            '  5. Try different browser/incognito mode\n' +
+            '  6. Clear browser cache (Ctrl+Shift+Delete) and reload';
         }
         
         throw new Error(userFriendlyError);

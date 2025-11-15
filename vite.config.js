@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => {
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Resource-Policy': 'cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net;"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net https://esm.sh; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net https://esm.sh;"
       },
       proxy: {
         '/api': {
@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Resource-Policy': 'cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net;"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://cdn.jsdelivr.net https://esm.sh; worker-src 'self' blob:; connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net https://esm.sh;"
       }
     },
     
